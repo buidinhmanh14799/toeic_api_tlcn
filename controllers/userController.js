@@ -1,5 +1,10 @@
 const User = require('../models/userModel')
 
+exports.getall = (req, res)=>{
+    User.find({role:['member','vipmember','promember']}).then(data=>{
+        res.send(data)
+    }).catch(err=>res.status(500).send(err))
+}
 exports.register = function (req, res) {
     try {
         let user = new User(req.body);

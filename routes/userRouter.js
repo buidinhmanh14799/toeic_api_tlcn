@@ -20,6 +20,7 @@ function requiresLogin(req, res, next) {
 }
 /* GET users listing. */
 // router.get('/', vocabularyController.getAll);
+router.get('/', userController.getall);
 router.post('/register', userController.register);
 router.get('/checkIDGoogle/:id', userController.checkIDGoogle);
 router.get('/checkIDFacebook/:id', userController.checkIDFaceBook);
