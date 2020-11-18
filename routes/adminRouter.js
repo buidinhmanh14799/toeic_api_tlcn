@@ -20,9 +20,9 @@ function requiresLogin(req, res, next) {
         return res.json({err: 'You must be logged in to view this page.'});
     }
 }
-router.post('/register',UserValidator, adminController.register);
+router.post('/register', adminController.register);
 router.put('/update/:id', adminController.Update);
-router.post('/test', requiresLogout, adminController.login);
+router.post('/login', requiresLogout, adminController.login);
 router.get('/logout', requiresLogin, adminController.logout);
 
 module.exports = router;

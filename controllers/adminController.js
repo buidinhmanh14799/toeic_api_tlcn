@@ -2,31 +2,35 @@ const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 
 
-exports.register = function (req, res, next) {
-    User.findOne({ email: req.body.email }, (err, user) => {
-        if (user == null) { //Kiểm tra xem email đã được sử dụng chưa
-            User.findOne({ username: req.body.username }, (err2, user2) => {
-                if (user2 == null) {
-                    bcrypt.hash(req.body.password, 10, function (err, hash) { //Mã hóa mật khẩu trước khi lưu vào db
-                        if (err) { return next(err); }
-                        const user = new User(req.body)
-                        user.role = 'admin' //sau khi register thì role auto là customer
-                        user.password = hash;
-                        user.save((err, result) => {
-                            if (err) { return res.json({ err }) }
-                            res.json({ user: result })
-                        })
-                    })
-                }
-                else {
-                    res.json({ err: 'Tên đăng nhập đã tồn tại' })
-                }
+exports.register = function (req, res) {
+    try {
+        let admin = new User(req.body);
+        admin.role = 'admin';
+        bcrypt.hash(req.body.password, 10).then(value => {
+            admin.password = value;
+            }).catch(err => {
+                console.log(err)
             })
+        admin.save().then(value => {
+            res.send(value);
+        }).catch(err => {
+            let object = err.errors;
+            var arr = []
+            for (const key in object) {
+                if (object.hasOwnProperty(key)) {
+                    const element = object[key];
+                    arr.push({name: key, message: element.message})
+                     
+                }
+            }
+            res.status(500).send(arr)
+            console.log(err)
+        })
 
-        } else {
-            res.json({ err: ' Email đã được đăng ký' })
-        }
-    })
+    } catch (error) {
+        res.status(500).send(error);
+    }
+
 }
 
 // exports.create = (req, res) => {
@@ -54,58 +58,58 @@ exports.Update = (req, res) => {
             console.log(req.body.password);
             bcrypt.hash(req.body.password, 10).then(value => {
                 console.log("băm ngoiai  " + value);
-                User.findByIdAndUpdate(req.params.id, {$set: {password: value}}).then(value2=>{ 
+                User.findByIdAndUpdate(req.params.id, { $set: { password: value } }).then(value2 => {
                     console.log("băm trong hàm update  " + value);
-                    console.log("oke")   
+                    console.log("oke")
                     res.send(value2);
-                }).catch(err=>{
+                }).catch(err => {
                     console.log(err)
                 })
             }).catch(err => {
                 return null;
             })
-        }else{
+        } else {
             res.send(value);
         }
-        
+
     })
 }
-exports.Singin = (req, res) =>{
-    User.findOne({_id: '5fb23ea658bd393618315756'}).then(value=>{
-        bcrypt.compare('123', value.password).then(rs=>{
+exports.Singin = (req, res) => {
+    User.findOne({ _id: '5fb23ea658bd393618315756' }).then(value => {
+        bcrypt.compare('123', value.password).then(rs => {
             res.send(rs);
         })
     })
-    
+
 }
-exports.login = function(req, res){
-    User.findOne({email: req.body.email}||{username: req.body.username}).exec(function(err, user){
-        if(err) {
-            return res.json({err})
-        }else if (!user){
-            return res.json({err: 'Username or Password are incorrect'})
+exports.login = function (req, res) {
+    User.findOne({ email: req.body.email } || { username: req.body.username }).exec(function (err, user) {
+        if (err) {
+            return res.status(500).send({ err })
+        } else if (!user) {
+            return res.status(500).send({ err: 'Username or Password are incorrect' })
         }
         bcrypt.compare(req.body.password, user.password, (err, result) => {
-            if(result === true){
+            if (result === true) {
                 req.session.user = user
                 res.json({
-                    user: user,
-                    "login": "success"
+                    user: req.session,
+                    "login": "success2"
                 })
-            }else{
-                return res.json({err: 'Username or Password are incorrect'})
+            } else {
+                return res.json({ err: 'Username or Password are incorrect' })
             }
         })
     })
 }
-exports.logout = function(req, res){
+exports.logout = function (req, res) {
     if (req.session) {
         // delete session object
-        req.session.destroy(function(err) {
-            if(err) {
-                return res.json({err});
+        req.session.destroy(function (err) {
+            if (err) {
+                return res.json({ err });
             } else {
-                return res.json({'logout': "Success"});
+                return res.json({ 'logout': "Success" });
             }
         });
     }

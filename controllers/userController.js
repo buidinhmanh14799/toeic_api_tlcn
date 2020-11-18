@@ -1,45 +1,86 @@
 const User = require('../models/userModel')
 
-exports.create = (req, res)=>{
-    const user = new User({
-        name: req.body.name,
-        username: req.body.username,
-        password: req.body.password,
-        avatar: req.body.avatar, 
-        email: req.body.email,
-        googleId: req.body.googleId,
-        facebookId: req.body.facebookId,
-        status: req.body.status
-    })
-    user.save().then((data)=>{
-        res.send(data)
-    }).catch((err)=>{
-        res.status(500).send(err.message)
-    });
-}
-exports.register =(req, res)=>{
-    User.findOne({email: req.body.email}, (err, user)=>{
-        if(user==null){
-            User.findOne({})
-        }else{
-            res.json({ err: 'Email đã được đăng ký' })
-        }
-    })
+exports.register = function (req, res) {
+    try {
+        let user = new User(req.body);
+        user.role = 'member';
+        bcrypt.hash(req.body.password, 10).then(value => {
+            user.password = value;
+        }).catch(err => {
+            console.log(err)
+        })
+        user.save().then(value => {
+            res.send(value);
+        }).catch(err => {
+            let object = err.errors;
+            for (const key in object) {
+                if (object.hasOwnProperty(key)) {
+                    const element = object[key].message;
+                    res.status(500).send(element)
+                }
+            }
+            console.log(err)
+        })
+
+    } catch (error) {
+        res.status(500).send(error);
+    }
+
 }
 
 exports.checkIDGoogle = (req, res) => {
-    admin.findOne({googleId: req.body.googleId}).then((value)=>{
-        console.log(value);
-        res.send(true);
-    }).catch((err)=>{
+    User.findOne({ googleId: req.params.id }).then((value) => {
+        if (value) {
+            console.log(value);
+            res.send(true);
+        } else {
+            res.send(false);
+        }
+    }).catch((err) => {
         res.send(false);
     })
 }
 exports.checkIDFaceBook = (req, res) => {
-    admin.findOne({facebookId: req.body.facebookId}).then((value)=>{
-        console.log(value);
-        res.send(true);
-    }).catch((err)=>{
+    User.findOne({ facebookId: req.params.id }).then((value) => {
+        if (value) {
+            console.log(value);
+            res.send(true);
+        } else {
+            res.send(false);
+        }
+    }).catch((err) => {
         res.send(false);
     })
+}
+exports.login = function (req, res) {
+    User.findOne({ email: req.body.email } || { username: req.body.username }).exec(function (err, user) {
+        if (err) {
+            return res.status(500).send({ err })
+        } else if (!user) {
+            return res.status(500).send({ err: 'Username or Password are incorrect' })
+        }
+        bcrypt.compare(req.body.password, user.password, (err, result) => {
+            if (result === true) {
+                req.session.user = user
+                res.json({
+                    user: req.session,
+                    "login": "success"
+                })
+            } else {
+                return res.json({ err: 'Username or Password are incorrect' })
+            }
+        })
+    })
+}
+exports.logout = function (req, res) {
+    if (req.session) {
+        // delete session object
+        req.session.destroy(function (err) {
+            if (err) {
+                return res.json({ err });
+            } else {
+                return res.json({ 'logout': "Success" });
+            }
+        });
+    }
 }
