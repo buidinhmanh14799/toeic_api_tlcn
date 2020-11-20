@@ -1,4 +1,5 @@
 const User = require('../models/userModel')
+const bcrypt = require('bcrypt')
 
 exports.getall = (req, res)=>{
     User.find({role:['member','vipmember','promember']}).then(data=>{

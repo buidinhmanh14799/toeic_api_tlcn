@@ -11,6 +11,7 @@ const expressValidator = require('express-validator')
 var voacaRouter = require('./routes/vocaRouter');
 var userRouter = require('./routes/userRouter');
 var adminRouter = require('./routes/adminRouter');
+var sendcode = require('./routes/sendcodeRouter');
 
 const dotenv = require('dotenv')
 
@@ -56,6 +57,7 @@ app.use(session({
 app.use('/voca', voacaRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
+app.use('/send', sendcode);
 
 
 

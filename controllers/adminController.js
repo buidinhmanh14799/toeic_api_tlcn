@@ -83,11 +83,11 @@ exports.Singin = (req, res) => {
 
 }
 exports.login = function (req, res) {
-    User.findOne({ email: req.body.email } || { username: req.body.username }).exec(function (err, user) {
+    User.findOne({ email: req.body.email }).exec(function (err, user) {
         if (err) {
             return res.status(500).send({ err })
         } else if (!user) {
-            return res.status(500).send({ err: 'Username or Password are incorrect' })
+            return res.status(404).send({ err: 'Username or Password are incorrect 1' })
         }
         bcrypt.compare(req.body.password, user.password, (err, result) => {
             if (result === true) {
