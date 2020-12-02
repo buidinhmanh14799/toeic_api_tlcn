@@ -8,9 +8,9 @@ exports.register = function (req, res) {
         admin.role = 'admin';
         bcrypt.hash(req.body.password, 10).then(value => {
             admin.password = value;
-            }).catch(err => {
-                console.log(err)
-            })
+        }).catch(err => {
+            console.log(err)
+        })
         admin.save().then(value => {
             res.send(value);
         }).catch(err => {
@@ -19,8 +19,8 @@ exports.register = function (req, res) {
             for (const key in object) {
                 if (object.hasOwnProperty(key)) {
                     const element = object[key];
-                    arr.push({name: key, message: element.message})
-                     
+                    arr.push({ name: key, message: element.message })
+
                 }
             }
             res.status(500).send(arr)
@@ -85,19 +85,28 @@ exports.Singin = (req, res) => {
 exports.login = function (req, res) {
     User.findOne({ email: req.body.email }).exec(function (err, user) {
         if (err) {
-            return res.status(500).send({ err })
+            return res.send({
+                err: err + '',
+                "login": "fail"
+            })
         } else if (!user) {
-            return res.status(404).send({ err: 'Username or Password are incorrect 1' })
+            return res.send({
+                err: 'Email is not registered',
+                "login": "fail"
+            })
         }
         bcrypt.compare(req.body.password, user.password, (err, result) => {
             if (result === true) {
                 req.session.user = user
                 res.json({
                     user: req.session,
-                    "login": "success2"
+                    "login": "success"
                 })
             } else {
-                return res.status(500).send({ err: 'Username or Password are incorrect' })
+                return res.send({
+                    err: 'Username or Password are incorrect',
+                    "login": "fail"
+                })
             }
         })
     })
