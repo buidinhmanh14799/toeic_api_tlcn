@@ -97,7 +97,7 @@ exports.login = function (req, res) {
                     "login": "success2"
                 })
             } else {
-                return res.json({ err: 'Username or Password are incorrect' })
+                return res.status(500).send({ err: 'Username or Password are incorrect' })
             }
         })
     })
