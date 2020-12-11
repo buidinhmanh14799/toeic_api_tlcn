@@ -28,4 +28,8 @@ router.put('/update/:id', adminController.Update);
 router.post('/login', requiresLogout, adminController.login);
 router.get('/logout', requiresLogin, adminController.logout);
 
+router.post('/authentication', requiresLogout, adminController.authentication);
+router.post('/api', requiresLogout, adminController.apiRouter);
+
+
 module.exports = router;

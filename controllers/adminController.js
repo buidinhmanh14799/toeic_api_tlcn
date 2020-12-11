@@ -119,6 +119,59 @@ exports.login = function (req, res) {
         })
     })
 }
+exports.authentication = function (req,res){
+    User.findOne({ email: req.body.email }).exec(function (err, user) {
+        if (err) {
+            return res.send({
+                err: err + '',
+                "login": "fail"
+            })
+        } else if (!user) {
+            return res.send({
+                err: 'Email is not registered',
+                "login": "fail"
+            })
+        }
+        bcrypt.compare(req.body.password, user.password, (err, result) => {
+            if (result === true) {
+                var token = jwt.sign({
+                    name: user.name,
+                    username: user.username
+                }, superSecret,{
+                    expiresIn: '24h'
+                })
+                res.json({
+                    success: true,
+                    token: token
+                })
+            } else {
+                return res.send({
+                    success: false,
+                    err: 'Username or Password are incorrect',
+                    "login": "fail"
+                })
+            }
+        })
+    })
+}
+exports.apiRouter = function(req, res){
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    if(token){
+        jwt.verify(token, superSecret, function(err, decoded){
+            if(err){
+                return res.json({ success: false, message:'Failed to authentication token.'});
+            } else{
+                req.decoded = decoded;
+                next();
+            }
+        });
+    }else{
+        return res.status(403).send({
+            success: false,
+            message:'No token provided'
+        })
+    }
+}
 exports.logout = function (req, res) {
     if (req.session) {
         // delete session object
