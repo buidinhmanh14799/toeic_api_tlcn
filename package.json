@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "env-cmd -f ./.env ./bin/www"
+    "start": "env-cmd -f ./.env nodemon ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
@@ -18,6 +18,7 @@
     "express-validator": "^5.3.0",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.14",
     "mongoose-unique-validator": "^2.0.3",
     "morgan": "^1.9.1",

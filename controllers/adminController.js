@@ -1,5 +1,6 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken');
 
 
 exports.register = function (req, res) {
@@ -98,9 +99,16 @@ exports.login = function (req, res) {
         bcrypt.compare(req.body.password, user.password, (err, result) => {
             if (result === true) {
                 req.session.user = user
+                var token = jwt.sign({
+                    name: user.name,
+                    username: user.username
+                }, superSecret,{
+                    expiresIn: '24h'
+                })
                 res.json({
-                    user: req.session,
-                    "login": "success"
+                    // user: req.session,
+                    success: true,
+                    token: token
                 })
             } else {
                 return res.send({
