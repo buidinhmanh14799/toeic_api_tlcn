@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "env-cmd -f ./.env ./bin/www"
+    "start": "env-cmd -f ./.env nodemon ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
@@ -24,6 +24,8 @@
     "morgan": "^1.9.1",
     "nodemailer": "^6.4.16",
     "nodemon": "^2.0.6",
+    "passport": "^0.4.1",
+    "passport-google-oauth": "^2.0.0",
     "session": "^0.1.0",
     "validator": "^13.1.17"
   },

@@ -12,9 +12,12 @@ var voacaRouter = require('./routes/vocaRouter');
 var userRouter = require('./routes/userRouter');
 var adminRouter = require('./routes/adminRouter');
 var sendcode = require('./routes/sendcodeRouter');
+var googleRouter = require('./routes/googleRouter');
 
 const dotenv = require('dotenv')
-
+// var expressSession = require('express-session');
+var passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 // dotenv.config()
 const mongoose = require('mongoose');
 const db = mongoose.connection;
@@ -29,6 +32,16 @@ var app = express();
 
 
 // view engine setup
+
+//Cấu hình express-session.
+// app.use(expressSession({secret: 'keyboard cat'}))
+//Cấu hình Passport.
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -58,6 +71,10 @@ app.use('/voca', voacaRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 app.use('/send', sendcode);
+app.use('/google', googleRouter);
+
+
+app.get('/auth/google/callback', passport.authenticate('google'));
 
 
 
@@ -82,5 +99,18 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: '457126058033-c4nb6s36lj0lc2c4tgndvap31efuft4f.apps.googleusercontent.com',
+      clientSecret: '80BQHBeXdRhXJkoFHj5PK41z',
+      callbackURL: '/auth/google/callback'
+    },
+    accessToken => {
+      console.log(accessToken);
+    }
+  )
+);
 
 module.exports = app;

@@ -98,17 +98,16 @@ exports.login = function (req, res) {
         }
         bcrypt.compare(req.body.password, user.password, (err, result) => {
             if (result === true) {
-                req.session.user = user
-                var token = jwt.sign({
-                    name: user.name,
-                    username: user.username
-                }, superSecret,{
-                    expiresIn: '24h'
-                })
+                // req.session.user = user
+                // var token = jwt.sign({
+                //     name: user.name,
+                //     username: user.username
+                // }, 'superSecret',{
+                //     expiresIn: '24h'
+                // })
                 res.json({
-                    // user: req.session,
-                    success: true,
-                    token: token
+                    user: user,
+                    "login": "success"
                 })
             } else {
                 return res.send({
@@ -137,7 +136,7 @@ exports.authentication = function (req,res){
                 var token = jwt.sign({
                     name: user.name,
                     username: user.username
-                }, superSecret,{
+                }, 'superSecret',{
                     expiresIn: '24h'
                 })
                 res.json({
@@ -157,12 +156,13 @@ exports.authentication = function (req,res){
 exports.apiRouter = function(req, res){
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     if(token){
-        jwt.verify(token, superSecret, function(err, decoded){
+        jwt.verify(token, 'superSecret', function(err, decoded){
             if(err){
                 return res.json({ success: false, message:'Failed to authentication token.'});
             } else{
                 req.decoded = decoded;
-                next();
+                res.send('oke')
+                // next();
             }
         });
     }else{

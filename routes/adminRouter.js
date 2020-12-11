@@ -22,14 +22,14 @@ function requiresLogin(req, res, next) {
         return res.json({err: 'You must be logged in to view this page.'});
     }
 }
-router.get('/', requiresLogin, userController.getall);
+router.get('/', userController.getall);
 router.post('/register', adminController.register);
 router.put('/update/:id', adminController.Update);
-router.post('/login', requiresLogout, adminController.login);
-router.get('/logout', requiresLogin, adminController.logout);
+router.post('/login', adminController.login);
+router.get('/logout', adminController.logout);
 
-router.post('/authentication', requiresLogout, adminController.authentication);
-router.post('/api', requiresLogout, adminController.apiRouter);
+router.post('/authentication', adminController.authentication);
+router.get('/api', adminController.apiRouter);
 
 
 module.exports = router;
