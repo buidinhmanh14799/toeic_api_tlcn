@@ -4,6 +4,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const cors = require('cors');
 
 const bodyParser = require('body-parser')
 const expressValidator = require('express-validator')
@@ -51,6 +52,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json())
 app.use(expressValidator())
+app.use(cors())
 
 //login
 const session = require('express-session')
@@ -72,7 +74,14 @@ app.use('/admin', adminRouter);
 app.use('/send', sendcode);
 app.use('/google', googleRouter);
 
-
+// app.use(
+//   cookieSession({
+//     maxAge: 30 * 24 * 60 * 60 * 1000,
+//     keys: [keys.cookieKey]
+//   })
+// );
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 
 
