@@ -39,8 +39,7 @@ var app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(passport.initialize());
 app.use(passport.session());
-
-
+// passport.use(new GoogleStrategy());
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
