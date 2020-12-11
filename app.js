@@ -39,7 +39,7 @@ var app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(passport.initialize());
 app.use(passport.session());
-// passport.use(new GoogleStrategy());
+
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -73,7 +73,7 @@ app.use('/send', sendcode);
 app.use('/google', googleRouter);
 
 
-app.get('/auth/google/callback', passport.authenticate('google'));
+
 
 
 
@@ -99,17 +99,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: '457126058033-c4nb6s36lj0lc2c4tgndvap31efuft4f.apps.googleusercontent.com',
-      clientSecret: '80BQHBeXdRhXJkoFHj5PK41z',
-      callbackURL: '/auth/google/callback'
-    },
-    accessToken => {
-      console.log(accessToken);
-    }
-  )
-);
 
 module.exports = app;
