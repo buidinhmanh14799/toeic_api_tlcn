@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 
 
 exports.register = function (req, res) {
+    console.log('???', req.body.password)
     try {
         let admin = new User(req.body);
         admin.role = 'admin';

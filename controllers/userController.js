@@ -1,15 +1,23 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 
-exports.getall = (req, res)=>{
-    User.find({role:['member','vipmember','promember']}).then(data=>{
+exports.getall = (req, res) => {
+    User.find({ role: ['member', 'vipmember', 'promember'] }).then(data => {
         res.send(data)
-    }).catch(err=>res.status(500).send(err))
+    }).catch(err => res.status(500).send(err))
+}
+exports.delete = (req, res) => {
+    User.findByIdAndUpdate(req.params.id, { $set: { status: false } }).then(() => {
+        res.send('ok');
+    }).catch(err => {
+        res.status(500).send(err + '');
+    })
 }
 exports.register = function (req, res) {
     try {
         let user = new User(req.body);
         user.role = 'member';
+        user.status = true;
         bcrypt.hash(req.body.password, 10).then(value => {
             user.password = value;
         }).catch(err => {
@@ -32,6 +40,14 @@ exports.register = function (req, res) {
         res.status(500).send(error);
     }
 
+}
+
+exports.update = (req, res) => {
+    User.findByIdAndUpdate(req.params.id, { $set: res.body }).then(user => {
+        res.send(user);
+    }).catch(err => {
+        res.status(500).send(err + '');
+    })
 }
 
 exports.checkIDGoogle = (req, res) => {

@@ -22,10 +22,10 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 // dotenv.config()
 const mongoose = require('mongoose');
 const db = mongoose.connection;
-mongoose.connect(process.env.mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}).then( function(){
+mongoose.connect(process.env.mongoDB, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }).then(function () {
   console.log("connected")
-}).catch((err)=>{
-  console.log("error"+err)
+}).catch((err) => {
+  console.log("error" + err)
 })
 
 var app = express();
@@ -37,7 +37,7 @@ var app = express();
 //Cấu hình express-session.
 // app.use(expressSession({secret: 'keyboard cat'}))
 //Cấu hình Passport.
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -63,7 +63,7 @@ app.use(session({
   resave: true,
   saveUninitialized: false,
   store: new MongoStore({
-      mongooseConnection: db
+    mongooseConnection: db
   })
 }));
 
@@ -93,12 +93,12 @@ app.use('/google', googleRouter);
 
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
