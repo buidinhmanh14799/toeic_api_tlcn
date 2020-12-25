@@ -13,6 +13,13 @@ exports.delete = (req, res) => {
         res.status(500).send(err + '');
     })
 }
+exports.enable = (req, res) => {
+    User.findByIdAndUpdate(req.params.id, { $set: { status: true } }).then(() => {
+        res.send('ok');
+    }).catch(err => {
+        res.status(500).send(err + '');
+    })
+}
 exports.register = function (req, res) {
     try {
         let user = new User(req.body);

@@ -25,6 +25,7 @@ router.post('/register', userController.register);
 router.post('/update/:id', userController.update);
 router.get('/checkIDGoogle/:id', userController.checkIDGoogle);
 router.post('/disable/:id', userController.delete);
+router.post('/enable/:id', userController.enable);
 router.get('/checkIDFacebook/:id', userController.checkIDFaceBook);
 
 router.post('/login', userController.login);
