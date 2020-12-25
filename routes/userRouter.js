@@ -22,7 +22,7 @@ function requiresLogin(req, res, next) {
 // router.get('/', vocabularyController.getAll);
 router.get('/', userController.getall);
 router.post('/register', userController.register);
-router.post('/update/:id', userController.update);
+router.put('/update/:id', userController.update);
 router.get('/checkIDGoogle/:id', userController.checkIDGoogle);
 router.put('/disable/:id', userController.delete);
 router.put('/enable/:id', userController.enable);
