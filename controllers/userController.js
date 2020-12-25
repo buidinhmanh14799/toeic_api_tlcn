@@ -7,15 +7,15 @@ exports.getall = (req, res) => {
     }).catch(err => res.status(500).send(err))
 }
 exports.delete = (req, res) => {
-    User.findByIdAndUpdate(req.params.id, { $set: { status: false } }).then(() => {
-        res.send('ok');
+    User.findByIdAndUpdate(req.params.id, { $set: { status: false } }).then((user) => {
+        res.send(user);
     }).catch(err => {
         res.status(500).send(err + '');
     })
 }
 exports.enable = (req, res) => {
-    User.findByIdAndUpdate(req.params.id, { $set: { status: true } }).then(() => {
-        res.send('ok');
+    User.findByIdAndUpdate(req.params.id, { $set: { status: true } }).then((user) => {
+        res.send(user);
     }).catch(err => {
         res.status(500).send(err + '');
     })
