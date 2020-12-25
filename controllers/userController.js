@@ -50,7 +50,7 @@ exports.register = function (req, res) {
 }
 
 exports.update = (req, res) => {
-    User.findByIdAndUpdate(req.params.id, { $set: res.body }).then(user => {
+    User.findByIdAndUpdate(req.params.id, { $set: req.body }).then(user => {
         res.send(user);
     }).catch(err => {
         res.status(500).send(err + '');
