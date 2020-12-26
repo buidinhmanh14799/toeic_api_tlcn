@@ -2,7 +2,11 @@ const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 
-
+exports.getall = (req, res) => {
+    User.find({ role: 'admin' }).then(data => {
+        res.send(data)
+    }).catch(err => res.status(500).send(err))
+}
 exports.register = function (req, res) {
     console.log('???', req.body.password)
     try {
@@ -119,7 +123,7 @@ exports.login = function (req, res) {
         })
     })
 }
-exports.authentication = function (req,res){
+exports.authentication = function (req, res) {
     User.findOne({ email: req.body.email }).exec(function (err, user) {
         if (err) {
             return res.send({
@@ -137,7 +141,7 @@ exports.authentication = function (req,res){
                 var token = jwt.sign({
                     name: user.name,
                     username: user.username
-                }, 'superSecret',{
+                }, 'superSecret', {
                     expiresIn: '24h'
                 })
                 res.json({
@@ -154,22 +158,22 @@ exports.authentication = function (req,res){
         })
     })
 }
-exports.apiRouter = function(req, res){
+exports.apiRouter = function (req, res) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
-    if(token){
-        jwt.verify(token, 'superSecret', function(err, decoded){
-            if(err){
-                return res.json({ success: false, message:'Failed to authentication token.'});
-            } else{
+    if (token) {
+        jwt.verify(token, 'superSecret', function (err, decoded) {
+            if (err) {
+                return res.json({ success: false, message: 'Failed to authentication token.' });
+            } else {
                 req.decoded = decoded;
                 res.send('oke')
                 // next();
             }
         });
-    }else{
+    } else {
         return res.status(403).send({
             success: false,
-            message:'No token provided'
+            message: 'No token provided'
         })
     }
 }

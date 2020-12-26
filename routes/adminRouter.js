@@ -22,7 +22,7 @@ function requiresLogin(req, res, next) {
         return res.json({err: 'You must be logged in to view this page.'});
     }
 }
-router.get('/', userController.getall);
+router.get('/', adminController.getall);
 router.post('/register', adminController.register);
 router.put('/update/:id', adminController.Update);
 router.post('/login', adminController.login);
