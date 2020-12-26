@@ -1,8 +1,13 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 
+// exports.getall = (req, res) => {
+//     User.find({ role: ['member', 'vipmember', 'promember'] }).then(data => {
+//         res.send(data)
+//     }).catch(err => res.status(500).send(err))
+// }
 exports.getall = (req, res) => {
-    User.find({ role: ['member', 'vipmember', 'promember'] }).then(data => {
+    User.find({ role: 'admin' }).then(data => {
         res.send(data)
     }).catch(err => res.status(500).send(err))
 }
