@@ -12,6 +12,7 @@ exports.register = function (req, res) {
     try {
         let admin = new User(req.body);
         admin.role = 'admin';
+        admin.status = true;
         bcrypt.hash(req.body.password, 10).then(value => {
             admin.password = value;
         }).catch(err => {
@@ -112,7 +113,7 @@ exports.login = function (req, res) {
                 // })
                 res.json({
                     user: user,
-                    "login": "success"
+                    "login": true
                 })
             } else {
                 return res.send({
@@ -184,7 +185,7 @@ exports.logout = function (req, res) {
             if (err) {
                 return res.json({ err });
             } else {
-                return res.json({ 'logout': "Success" });
+                return res.json({ 'logout': true });
             }
         });
     }

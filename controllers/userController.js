@@ -94,7 +94,7 @@ exports.login = function (req, res) {
                 req.session.user = user
                 res.json({
                     user: req.session,
-                    "login": "success"
+                    "login": true
                 })
             } else {
                 return res.json({ err: 'Username or Password are incorrect' })
@@ -109,7 +109,7 @@ exports.logout = function (req, res) {
             if (err) {
                 return res.json({ err });
             } else {
-                return res.json({ 'logout': "Success" });
+                return res.json({ 'logout': true });
             }
         });
     }
