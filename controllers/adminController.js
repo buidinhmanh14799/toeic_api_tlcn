@@ -20,7 +20,9 @@ exports.register = async function (req, res) {
         admin.status = true;
         admin.password = await bcrypt.hash(req.body.password, salt, null);
         admin.save().then(value => {
-            res.send(value);
+            res.json({
+                success: true,
+            });
         }).catch(err => {
             console.log(err)
             res.status(500).send(err);
