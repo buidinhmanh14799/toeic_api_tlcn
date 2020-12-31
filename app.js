@@ -76,31 +76,31 @@ app.use('/send', sendcode);
 app.use('/google', googleRouter);
 
 console.log(process.env.JWT_SECRET_KEY)
-// app.use(function (req, res, next) {
-//   let token = req.headers.authorization;
-//   if (!token) {
-//     token = req.headers.cookie?.split('=')[1];
-//   }
-//   if (token) {
-//     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//     // @ts-ignore
-//     jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
-//       if (err) {
-//         return res.status(403).json({
-//           success: false,
-//           message: 'Failed to authenticate token',
-//         });
-//       }
-//       req.accepted = decoded;
-//       next();
-//     });
-//   } else {
-//     res.status(403).json({
-//       success: false,
-//       message: 'No token provided',
-//     });
-//   }
-// });
+app.use(function (req, res, next) {
+  let token = req.headers.authorization;
+  if (!token) {
+    token = req.headers.cookie?.split('=')[1];
+  }
+  if (token) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
+      if (err) {
+        return res.status(403).json({
+          success: false,
+          message: 'Failed to authenticate token',
+        });
+      }
+      req.accepted = decoded;
+      next();
+    });
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'No token provided',
+    });
+  }
+});
 // app.use(
 //   cookieSession({
 //     maxAge: 30 * 24 * 60 * 60 * 1000,
