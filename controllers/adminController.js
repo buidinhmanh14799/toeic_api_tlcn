@@ -227,7 +227,7 @@ exports.google = async (req, res) => {
                         const user = new User({
                             name: name,
                             email: email,
-                            password: await hash(password, generateSalt(11)),
+                            password: await hash(password, salt, null),
                             follower: follower,
                         });
                         await user
@@ -324,7 +324,7 @@ exports.facebook = async (req, res) => {
             user = new User({
                 name: name,
                 email: email,
-                password: await hash(password, generateSalt(11)),
+                password: await hash(password, salt, null),
                 follower: follower,
             });
 
