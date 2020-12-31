@@ -76,33 +76,33 @@ app.use('/send', sendcode);
 app.use('/google', googleRouter);
 console.log('truoc');
 
-var apiRouter = express.Router();
-apiRouter.use((req, res, next) => {
-  console.log('vao dau yyyyyyyyyyyyyyyyyyyyyyy');
-  let token = req.headers.authorization;
-  if (!token) {
-    token = req.headers.cookie?.split('=')[1];
-  }
-  // var token =req.body.token || req.query.token||req.headers['x-access-token']
-  if (token) {
-    jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
-      if (err) {
-        return res.status(403).json({
-          success: false,
-          message: 'Failed to authenticate token',
-        });
-      }
-      req.accepted = decoded;
-      next();
-    });
-  } else {
-    res.status(403).json({
-      success: false,
-      message: 'No token provided',
-    });
-  }
-});
-console.log('sau');
+// var apiRouter = express.Router();
+// apiRouter.use((req, res, next) => {
+//   console.log('vao dau yyyyyyyyyyyyyyyyyyyyyyy');
+//   let token = req.headers.authorization;
+//   if (!token) {
+//     token = req.headers.cookie?.split('=')[1];
+//   }
+//   // var token =req.body.token || req.query.token||req.headers['x-access-token']
+//   if (token) {
+//     jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
+//       if (err) {
+//         return res.status(403).json({
+//           success: false,
+//           message: 'Failed to authenticate token',
+//         });
+//       }
+//       req.accepted = decoded;
+//       next();
+//     });
+//   } else {
+//     res.status(403).json({
+//       success: false,
+//       message: 'No token provided',
+//     });
+//   }
+// });
+// console.log('sau');
 
 // app.use(
 //   cookieSession({
