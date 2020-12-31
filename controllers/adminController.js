@@ -181,6 +181,7 @@ exports.logout = function (req, res) {
 // Google Login
 exports.google = async (req, res) => {
     const { idToken } = req.body;
+    console.log('manh', idToken)
     if (idToken) {
         const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 
@@ -189,7 +190,7 @@ exports.google = async (req, res) => {
             // @ts-ignore
             const { email_verified, name, email } = response.payload;
             if (email_verified) {
-                User.findOne({ email }).then(async user => {
+                User.findOne({ email: email }).then(async user => {
                     if (user) {
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
