@@ -7,6 +7,53 @@ const salt = bcrypt.genSaltSync(saltRounds);
 const hash = bcrypt.hashSync(myPlaintextPassword, salt);
 const OAuth2Client = require('google-auth-library');
 
+exports.get = async (req, res) => {
+    await Post.find()
+        .then(posts => {
+            if (posts.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'no post yet',
+                });
+            }
+            posts = posts.sort(compare);
+            const data = [];
+            posts.forEach(async post => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                const { _id, name, avatar } = await User.findById(post.userId);
+                data.push({
+                    userId: _id,
+                    name: name,
+                    avatar: avatar,
+                    postId: post._id,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    content: post.content,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    image: post.image,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    likeBy: post.likeBy,
+                });
+                if (data.length === posts.length) {
+                    return res.status(200).json({
+                        success: true,
+                        message: 'get list post',
+                        data,
+                    });
+                }
+            });
+        })
+        .catch(err =>
+            res.status(500).json({
+                success: false,
+                message: 'cannot get posts',
+                err,
+            }),
+        );
+};
 exports.getall = (req, res) => {
     User.find({ role: 'admin' }).then(data => {
         res.send(data)
