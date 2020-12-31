@@ -75,15 +75,13 @@ app.use('/admin', adminRouter);
 app.use('/send', sendcode);
 app.use('/google', googleRouter);
 
-console.log(process.env.JWT_SECRET_KEY)
-app.use(function (req, res, next) {
+app.use((req, res, next)=> {
+  console.log('vao dau yyyyyyyyyyyyyyyyyyyyyyy');
   let token = req.headers.authorization;
   if (!token) {
     token = req.headers.cookie?.split('=')[1];
   }
   if (token) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
       if (err) {
         return res.status(403).json({
@@ -101,6 +99,9 @@ app.use(function (req, res, next) {
     });
   }
 });
+
+console.log(process.env.JWT_SECRET_KEY)
+
 // app.use(
 //   cookieSession({
 //     maxAge: 30 * 24 * 60 * 60 * 1000,
