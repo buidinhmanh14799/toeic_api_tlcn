@@ -1,37 +1,29 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
+const saltRounds = 10;
+const myPlaintextPassword = 's0/\/\P4$$w0rD';
+const salt = bcrypt.genSaltSync(saltRounds);
+const hash = bcrypt.hashSync(myPlaintextPassword, salt);
+const OAuth2Client = require('google-auth-library');
 
 exports.getall = (req, res) => {
     User.find({ role: 'admin' }).then(data => {
         res.send(data)
     }).catch(err => res.status(500).send(err))
 }
-exports.register = function (req, res) {
+exports.register = async function (req, res) {
     console.log('???', req.body.password)
     try {
         let admin = new User(req.body);
         admin.role = 'admin';
         admin.status = true;
-        bcrypt.hash(req.body.password, 10).then(value => {
-            admin.password = value;
-        }).catch(err => {
-            console.log(err)
-        })
+        admin.password = await bcrypt.hash(req.body.password, salt, null);
         admin.save().then(value => {
             res.send(value);
         }).catch(err => {
-            let object = err.errors;
-            var arr = []
-            for (const key in object) {
-                if (object.hasOwnProperty(key)) {
-                    const element = object[key];
-                    arr.push({ name: key, message: element.message })
-
-                }
-            }
-            res.status(500).send(arr)
             console.log(err)
+            res.status(500).send(err);
         })
 
     } catch (error) {
@@ -39,24 +31,6 @@ exports.register = function (req, res) {
     }
 
 }
-
-// exports.create = (req, res) => {
-//     const admin = new Admin({
-//         name: req.body.name,
-//         username: req.body.username,
-//         password: req.body.password,
-//         avatar: req.body.avatar,
-//         email: req.body.email,
-//         googleId: req.body.googleId,
-//         facebookId: req.body.facebookId,
-//         status: req.body.status
-//     })
-//     admin.save().then((data) => {
-//         res.send(data)
-//     }).catch((err) => {
-//         res.status(500).send(err.message)
-//     });
-// }
 
 exports.Update = (req, res) => {
     console.log("matkhaumoi:" + req.body.password)
@@ -89,37 +63,49 @@ exports.Singin = (req, res) => {
     })
 
 }
-exports.login = function (req, res) {
-    User.findOne({ email: req.body.email }).exec(function (err, user) {
+exports.login = async function (req, res) {
+    const { email, password } = req.body;
+    await User.findOne({ email: email }).exec(async function (err, user) {
         if (err) {
-            return res.send({
-                err: err + '',
-                "login": "fail"
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
             })
         } else if (!user) {
-            return res.send({
-                err: 'Email is not registered',
-                "login": "fail"
+            return res.status(404).json({
+                success: false,
+                message: 'Email is not registered',
             })
         }
-        bcrypt.compare(req.body.password, user.password, (err, result) => {
+        bcrypt.compare(password, user.password, (err, result) => {
             if (result === true) {
-                // req.session.user = user
-                // var token = jwt.sign({
-                //     name: user.name,
-                //     username: user.username
-                // }, 'superSecret',{
-                //     expiresIn: '24h'
-                // })
-                res.json({
-                    user: user,
-                    "login": true
-                })
+                const token = jwt.sign(
+                    {
+                        name: user.name,
+                        email: user.email,
+                    },
+                    process.env.JWT_SECRET_KEY,
+                    {
+                        expiresIn: '24h',
+                    },
+                );
+                const { _id, name, email, follower } = user;
+                return res.status(200).json({
+                    success: true,
+                    message: 'Correct Details',
+                    token: token,
+                    user: {
+                        _id,
+                        name,
+                        email,
+                        follower,
+                    },
+                });
             } else {
-                return res.send({
-                    err: 'Username or Password are incorrect',
-                    "login": "fail"
-                })
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid Username or Password',
+                });
             }
         })
     })
@@ -190,3 +176,172 @@ exports.logout = function (req, res) {
         });
     }
 }
+// Google Login
+exports.google = async (req, res) => {
+    const { idToken } = req.body;
+    if (idToken) {
+        const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
+
+        await client.verifyIdToken({ idToken, audience: process.env.GOOGLE_APP_ID }).then(response => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const { email_verified, name, email } = response.payload;
+            if (email_verified) {
+                User.findOne({ email }).then(async user => {
+                    if (user) {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        const { name, email } = user;
+                        const token = jwt.sign(
+                            {
+                                name: name,
+                                email: email,
+                            },
+                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                            // @ts-ignore
+                            process.env.JWT_SECRET_KEY,
+                            {
+                                expiresIn: '24h',
+                            },
+                        );
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        const { _id, follower } = user;
+                        res.status(200).json({
+                            success: true,
+                            message: 'Correct Details',
+                            token: token,
+                            user: {
+                                _id,
+                                name,
+                                email,
+                                follower,
+                            },
+                        });
+                    } else {
+                        const password = email + process.env.JWT_SECRET;
+                        const follower = [];
+                        const user = new User({
+                            name: name,
+                            email: email,
+                            password: await hash(password, generateSalt(11)),
+                            follower: follower,
+                        });
+                        await user
+                            .save()
+                            .then(user => {
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                const { _id, name, email, follower } = user;
+                                const token = jwt.sign(
+                                    {
+                                        name: name,
+                                        email: email,
+                                    },
+                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                    // @ts-ignore
+                                    process.env.JWT_SECRET_KEY,
+                                    {
+                                        expiresIn: '24h',
+                                    },
+                                );
+                                res.status(200).json({
+                                    success: true,
+                                    message: 'Correct Details',
+                                    token: token,
+                                    user: {
+                                        _id,
+                                        name,
+                                        email,
+                                        follower,
+                                    },
+                                });
+                            })
+                            .catch(err => {
+                                res.status(401).json({
+                                    success: false,
+                                    message: err,
+                                });
+                            });
+                    }
+                });
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Google login failed. Try again',
+                });
+            }
+        });
+    }
+    return res.status(401).json({
+        success: false,
+        message: 'no token provide',
+    });
+};
+
+exports.facebook = async (req, res) => {
+    const { accessToken } = req.body;
+
+    const { data } = await axios({
+        url: 'https://graph.facebook.com/me',
+        method: 'get',
+        params: {
+            fields: ['id', 'email', 'name'].join(','),
+            access_token: accessToken,
+        },
+    });
+    let { email } = data;
+    const { id, name } = data; // { id, email, name }
+    if (!email) {
+        email = id + '@facebook.com';
+    }
+
+    User.findOne({ email }).then(async user => {
+        if (user) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
+                expiresIn: '7d',
+            });
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const { _id, name, follower } = user;
+            return res.json({
+                token,
+                user: {
+                    _id,
+                    name,
+                    email,
+                    follower,
+                },
+            });
+        } else {
+            const password = email + process.env.JWT_SECRET;
+            const follower = [];
+            user = new User({
+                name: name,
+                email: email,
+                password: await hash(password, generateSalt(11)),
+                follower: follower,
+            });
+
+            user.save().then(data => {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                const token = jwt.sign({ _id: data._id }, process.env.JWT_SECRET_KEY, { expiresIn: '7d' });
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                const { _id, name, follower } = data;
+                return res.json({
+                    token,
+                    user: {
+                        _id,
+                        name,
+                        email,
+                        follower,
+                    },
+                });
+            });
+        }
+    });
+};

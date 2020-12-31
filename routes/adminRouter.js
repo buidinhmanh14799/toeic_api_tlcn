@@ -26,6 +26,8 @@ router.get('/', adminController.getall);
 router.post('/register', adminController.register);
 router.put('/update/:id', adminController.Update);
 router.post('/login', adminController.login);
+router.post('/google', adminController.google);
+router.post('/facebook', adminController.facebook);
 router.get('/logout', adminController.logout);
 
 router.post('/authentication', adminController.authentication);
