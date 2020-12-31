@@ -74,13 +74,16 @@ app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 app.use('/send', sendcode);
 app.use('/google', googleRouter);
+console.log('truoc');
 
-app.use((req, res, next)=> {
+var apiRouter = express.Router();
+apiRouter.use((req, res, next) => {
   console.log('vao dau yyyyyyyyyyyyyyyyyyyyyyy');
   let token = req.headers.authorization;
   if (!token) {
     token = req.headers.cookie?.split('=')[1];
   }
+  // var token =req.body.token || req.query.token||req.headers['x-access-token']
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
       if (err) {
@@ -99,8 +102,7 @@ app.use((req, res, next)=> {
     });
   }
 });
-
-console.log(process.env.JWT_SECRET_KEY)
+console.log('sau');
 
 // app.use(
 //   cookieSession({
