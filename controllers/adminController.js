@@ -5,7 +5,7 @@ const saltRounds = 10;
 const myPlaintextPassword = 's0/\/\P4$$w0rD';
 const salt = bcrypt.genSaltSync(saltRounds);
 const hash = bcrypt.hashSync(myPlaintextPassword, salt);
-const OAuth2Client = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library');
 
 exports.getall = (req, res) => {
     User.find({ role: 'admin' }).then(data => {
@@ -181,6 +181,7 @@ exports.logout = function (req, res) {
 // Google Login
 exports.google = async (req, res) => {
     const { idToken } = req.body;
+    
     console.log('manh', idToken)
     if (idToken) {
         const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
@@ -189,6 +190,7 @@ exports.google = async (req, res) => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const { email_verified, name, email } = response.payload;
+            console.log('response.payload', response.payload)
             if (email_verified) {
                 User.findOne({ email: email }).then(async user => {
                     if (user) {
@@ -210,7 +212,7 @@ exports.google = async (req, res) => {
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
                         const { _id, follower } = user;
-                        res.status(200).json({
+                        return res.status(200).json({
                             success: true,
                             message: 'Correct Details',
                             token: token,
@@ -275,11 +277,13 @@ exports.google = async (req, res) => {
                 });
             }
         });
+    }else{
+        return res.status(401).json({
+            success: false,
+            message: 'no token provide',
+        });
     }
-    return res.status(401).json({
-        success: false,
-        message: 'no token provide',
-    });
+
 };
 
 exports.facebook = async (req, res) => {
