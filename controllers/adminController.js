@@ -6,6 +6,7 @@ const myPlaintextPassword = 's0/\/\P4$$w0rD';
 const salt = bcrypt.genSaltSync(saltRounds);
 const hash = bcrypt.hashSync(myPlaintextPassword, salt);
 const { OAuth2Client } = require('google-auth-library');
+const axios = require('axios');
 
 exports.getall = (req, res) => {
     User.find({ role: 'admin' }).then(data => {
@@ -181,7 +182,7 @@ exports.logout = function (req, res) {
 // Google Login
 exports.google = async (req, res) => {
     const { idToken } = req.body;
-    
+
     console.log('manh', idToken)
     if (idToken) {
         const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
@@ -277,7 +278,7 @@ exports.google = async (req, res) => {
                 });
             }
         });
-    }else{
+    } else {
         return res.status(401).json({
             success: false,
             message: 'no token provide',
@@ -297,6 +298,7 @@ exports.facebook = async (req, res) => {
             access_token: accessToken,
         },
     });
+    console.log(data);
     let { email } = data;
     const { id, name } = data; // { id, email, name }
     if (!email) {
