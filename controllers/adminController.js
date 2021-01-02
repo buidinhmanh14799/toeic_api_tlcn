@@ -218,19 +218,20 @@ exports.google = async (req, res) => {
             if (email_verified) {
                 User.findOne({ email: email }).then(async user => {
                     if (user) {
-                        const { name, email, avatar } = user;
+                        const { _id, name, avatar, phonenumber, status } = user;
                         const token = jwt.sign(
                             {
                                 name: name,
                                 email: email,
                                 avatar: avatar,
+                                phonenumber: phonenumber,
+                                status: status
                             },
                             process.env.JWT_SECRET_KEY,
                             {
                                 expiresIn: '24h',
                             },
                         );
-                        const { _id } = user;
                         return res.status(200).json({
                             success: true,
                             message: 'Correct Details',
@@ -239,7 +240,9 @@ exports.google = async (req, res) => {
                                 _id,
                                 name,
                                 email,
-                                avatar
+                                avatar,
+                                phonenumber,
+                                status
                             },
                         });
                     } else {
@@ -250,20 +253,22 @@ exports.google = async (req, res) => {
                             password: await bcrypt.hash(password, salt, null),
                             avatar: picture,
                             googleId: sub,
-                            phonenumber: ''
+                            phonenumber: '',
+                            status: true
                         });
                         await user
                             .save()
                             .then(user => {
                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                 // @ts-ignore
-                                const { _id, name, email, avatar, phonenumber } = user;
+                                const { _id, name, email, avatar, phonenumber, status } = user;
                                 const token = jwt.sign(
                                     {
                                         name: name,
                                         email: email,
                                         avatar: avatar,
-                                        phonenumber: phonenumber
+                                        phonenumber: phonenumber,
+                                        status: status
                                     },
                                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                     // @ts-ignore
@@ -281,7 +286,8 @@ exports.google = async (req, res) => {
                                         name,
                                         email,
                                         avatar,
-                                        phonenumber
+                                        phonenumber,
+                                        status
                                     },
                                 });
                             })
@@ -331,27 +337,45 @@ exports.facebook = async (req, res) => {
         if (user) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
-                expiresIn: '7d',
-            });
+            const { _id, name, avatar, phonenumber, status } = user;
+            const token = jwt.sign(
+                {
+                    name: name,
+                    email: email,
+                    avatar: avatar,
+                    phonenumber: phonenumber,
+                    status: status
+                },
+                process.env.JWT_SECRET_KEY,
+                {
+                    expiresIn: '24h',
+                },
+            );
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            const { _id, name } = user;
+
             return res.json({
                 token,
                 user: {
                     _id,
                     name,
-                    email
+                    email,
+                    avatar,
+                    phonenumber,
+                    status
                 },
             });
         } else {
+            const picture = 'https://www.flaticon.com/svg/static/icons/svg/236/236832.svg';
             const password = email + process.env.JWT_SECRET;
-            const follower = [];
             user = new User({
                 name: name,
                 email: email,
                 password: await bcrypt.hash(password, salt, null),
+                avatar: picture,
+                phonenumber: '',
+                status: true,
+                facebookId: id
             });
 
             user.save().then(data => {
@@ -366,7 +390,10 @@ exports.facebook = async (req, res) => {
                     user: {
                         _id,
                         name,
-                        email
+                        email,
+                        avatar,
+                        phonenumber,
+                        status
                     },
                 });
             });
