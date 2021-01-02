@@ -23,6 +23,7 @@ function requiresLogin(req, res, next) {
     }
 }
 router.get('/', adminController.getall);
+router.get('/:id', adminController.getDetail);
 router.post('/register', adminController.register);
 router.put('/update/:id', adminController.UpdatePassWord);
 router.post('/login', adminController.login);

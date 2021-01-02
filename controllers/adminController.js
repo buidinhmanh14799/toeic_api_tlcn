@@ -13,6 +13,26 @@ exports.getall = (req, res) => {
         res.send(data)
     }).catch(err => res.status(500).send(err))
 }
+exports.getDetail = (req, res) => {
+    User.findById(req.params.id).then(user => {
+        if (user) {
+            return res.status(200).json({
+                success: true,
+                message: user
+            });
+        } else {
+            return res.status(500).json({
+                success: true,
+                message: 'user null'
+            });
+        }
+    }).catch(err => {
+        return res.status(500).json({
+            success: true,
+            message: err + ''
+        });
+    })
+}
 exports.register = async function (req, res) {
     console.log('???', req.body.password)
     try {
