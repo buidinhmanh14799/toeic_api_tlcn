@@ -21,21 +21,28 @@ exports.register = async function (req, res) {
         admin.status = true;
         admin.password = await bcrypt.hash(req.body.password, salt, null);
         admin.save().then(value => {
-            res.json({
+            return res.status(200).json({
                 success: true,
+                message: value
             });
         }).catch(err => {
             console.log(err)
-            res.status(500).send(err);
+            return res.status(500).json({
+                success: false,
+                message: err + ''
+            });
         })
 
     } catch (error) {
-        res.status(500).send(error);
+        return res.status(500).json({
+            success: false,
+            message: error + ''
+        });
     }
 
 }
 
-exports.Update = (req, res) => {
+exports.UpdatePassWord = (req, res) => {
     console.log("matkhaumoi:" + req.body.password)
     User.findByIdAndUpdate(req.params.id, { $set: req.body }).then(value => {
         if (req.body.password) {
@@ -45,17 +52,36 @@ exports.Update = (req, res) => {
                 User.findByIdAndUpdate(req.params.id, { $set: { password: value } }).then(value2 => {
                     console.log("băm trong hàm update  " + value);
                     console.log("oke")
-                    res.send(value2);
+                    return res.status(200).json({
+                        success: true,
+                        message: value2,
+                    });
                 }).catch(err => {
                     console.log(err)
                 })
             }).catch(err => {
-                return null;
+                return res.status(500).json({
+                    success: false,
+                    message: err + '',
+                });
             })
         } else {
             res.send(value);
         }
 
+    })
+}
+exports.updateInfo = (req, res) => {
+    User.findByIdAndUpdate(req.params.id, { $set: req.body }).then(user => {
+        return res.status(200).json({
+            success: true,
+            message: user,
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            success: false,
+            message: err + '',
+        });
     })
 }
 exports.Singin = (req, res) => {
@@ -113,60 +139,41 @@ exports.login = async function (req, res) {
         })
     })
 }
-exports.authentication = function (req, res) {
-    User.findOne({ email: req.body.email }).exec(function (err, user) {
-        if (err) {
-            return res.send({
-                err: err + '',
-                "login": "fail"
-            })
-        } else if (!user) {
-            return res.send({
-                err: 'Email is not registered',
-                "login": "fail"
-            })
-        }
-        bcrypt.compare(req.body.password, user.password, (err, result) => {
-            if (result === true) {
-                var token = jwt.sign({
-                    name: user.name,
-                    username: user.username
-                }, 'superSecret', {
-                    expiresIn: '24h'
-                })
-                res.json({
-                    success: true,
-                    token: token
-                })
-            } else {
-                return res.send({
-                    success: false,
-                    err: 'Username or Password are incorrect',
-                    "login": "fail"
-                })
-            }
-        })
-    })
-}
-exports.apiRouter = function (req, res) {
-    var token = req.body.token || req.query.token || req.headers['x-access-token'];
-    if (token) {
-        jwt.verify(token, 'superSecret', function (err, decoded) {
-            if (err) {
-                return res.json({ success: false, message: 'Failed to authentication token.' });
-            } else {
-                req.decoded = decoded;
-                res.send('oke')
-                // next();
-            }
-        });
-    } else {
-        return res.status(403).send({
-            success: false,
-            message: 'No token provided'
-        })
-    }
-}
+// exports.authentication = function (req, res) {
+//     User.findOne({ email: req.body.email }).exec(function (err, user) {
+//         if (err) {
+//             return res.send({
+//                 err: err + '',
+//                 "login": "fail"
+//             })
+//         } else if (!user) {
+//             return res.send({
+//                 err: 'Email is not registered',
+//                 "login": "fail"
+//             })
+//         }
+//         bcrypt.compare(req.body.password, user.password, (err, result) => {
+//             if (result === true) {
+//                 var token = jwt.sign({
+//                     name: user.name,
+//                     username: user.username
+//                 }, 'superSecret', {
+//                     expiresIn: '24h'
+//                 })
+//                 res.json({
+//                     success: true,
+//                     token: token
+//                 })
+//             } else {
+//                 return res.send({
+//                     success: false,
+//                     err: 'Username or Password are incorrect',
+//                     "login": "fail"
+//                 })
+//             }
+//         })
+//     })
+// }
 exports.logout = function (req, res) {
     if (req.session) {
         // delete session object
@@ -182,37 +189,26 @@ exports.logout = function (req, res) {
 // Google Login
 exports.google = async (req, res) => {
     const { idToken } = req.body;
-
-    console.log('manh', idToken)
     if (idToken) {
         const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 
         await client.verifyIdToken({ idToken, audience: process.env.GOOGLE_APP_ID }).then(response => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
             const { email_verified, name, email } = response.payload;
-            console.log('response.payload', response.payload)
             if (email_verified) {
                 User.findOne({ email: email }).then(async user => {
                     if (user) {
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
                         const { name, email } = user;
                         const token = jwt.sign(
                             {
                                 name: name,
                                 email: email,
                             },
-                            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-ignore
                             process.env.JWT_SECRET_KEY,
                             {
                                 expiresIn: '24h',
                             },
                         );
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        const { _id, follower } = user;
+                        const { _id } = user;
                         return res.status(200).json({
                             success: true,
                             message: 'Correct Details',
@@ -220,25 +216,22 @@ exports.google = async (req, res) => {
                             user: {
                                 _id,
                                 name,
-                                email,
-                                follower,
+                                email
                             },
                         });
                     } else {
                         const password = email + process.env.JWT_SECRET;
-                        const follower = [];
                         const user = new User({
                             name: name,
                             email: email,
                             password: await hash(password, salt, null),
-                            follower: follower,
                         });
                         await user
                             .save()
                             .then(user => {
                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                 // @ts-ignore
-                                const { _id, name, email, follower } = user;
+                                const { _id, name, email } = user;
                                 const token = jwt.sign(
                                     {
                                         name: name,
@@ -259,7 +252,6 @@ exports.google = async (req, res) => {
                                         _id,
                                         name,
                                         email,
-                                        follower,
                                     },
                                 });
                             })
@@ -314,14 +306,13 @@ exports.facebook = async (req, res) => {
             });
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            const { _id, name, follower } = user;
+            const { _id, name } = user;
             return res.json({
                 token,
                 user: {
                     _id,
                     name,
-                    email,
-                    follower,
+                    email
                 },
             });
         } else {
@@ -331,7 +322,6 @@ exports.facebook = async (req, res) => {
                 name: name,
                 email: email,
                 password: await hash(password, salt, null),
-                follower: follower,
             });
 
             user.save().then(data => {
@@ -346,8 +336,7 @@ exports.facebook = async (req, res) => {
                     user: {
                         _id,
                         name,
-                        email,
-                        follower,
+                        email
                     },
                 });
             });
