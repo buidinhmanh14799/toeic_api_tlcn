@@ -254,7 +254,7 @@ exports.google = async (req, res) => {
                             avatar: picture,
                             googleId: sub,
                             phonenumber: '',
-                            status: true,
+                            status: false,
                             role: 'admin'
                         });
                         await user
@@ -262,7 +262,7 @@ exports.google = async (req, res) => {
                             .then(user => {
                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                 // @ts-ignore
-                                const { _id, name, email, avatar, phonenumber, status } = user;
+                                const { _id, name, avatar, phonenumber, status } = user;
                                 const token = jwt.sign(
                                     {
                                         name: name,
@@ -271,8 +271,6 @@ exports.google = async (req, res) => {
                                         phonenumber: phonenumber,
                                         status: status
                                     },
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-ignore
                                     process.env.JWT_SECRET_KEY,
                                     {
                                         expiresIn: '24h',
@@ -375,7 +373,7 @@ exports.facebook = async (req, res) => {
                 password: await bcrypt.hash(password, salt, null),
                 avatar: picture,
                 phonenumber: '',
-                status: true,
+                status: false,
                 facebookId: id,
                 role: 'admin'
             });
