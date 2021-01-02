@@ -161,7 +161,7 @@ exports.login = async function (req, res) {
                     },
                     process.env.JWT_SECRET_KEY,
                     {
-                        expiresIn: '24h',
+                        expiresIn: '3m',
                     },
                 );
                 const { _id, name, email, follower } = user;
@@ -255,7 +255,7 @@ exports.google = async (req, res) => {
                             },
                             process.env.JWT_SECRET_KEY,
                             {
-                                expiresIn: '24h',
+                                expiresIn: '3m',
                             },
                         );
                         return res.status(200).json({
@@ -299,7 +299,7 @@ exports.google = async (req, res) => {
                                     },
                                     process.env.JWT_SECRET_KEY,
                                     {
-                                        expiresIn: '24h',
+                                        expiresIn: '3m',
                                     },
                                 );
                                 return res.status(200).json({
@@ -373,7 +373,7 @@ exports.facebook = async (req, res) => {
                 },
                 process.env.JWT_SECRET_KEY,
                 {
-                    expiresIn: '24h',
+                    expiresIn: '3m',
                 },
             );
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -418,7 +418,7 @@ exports.facebook = async (req, res) => {
                     },
                     process.env.JWT_SECRET_KEY,
                     {
-                        expiresIn: '24h',
+                        expiresIn: '3m',
                     },
                 );
 
