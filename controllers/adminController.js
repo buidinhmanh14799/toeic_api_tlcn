@@ -213,15 +213,17 @@ exports.google = async (req, res) => {
         const client = new OAuth2Client(process.env.GOOGLE_APP_ID);
 
         await client.verifyIdToken({ idToken, audience: process.env.GOOGLE_APP_ID }).then(response => {
-            const { email_verified, name, email } = response.payload;
+            const { email_verified, name, email, picture, sub } = response.payload;
+            console.log('response.payload', response.payload)
             if (email_verified) {
                 User.findOne({ email: email }).then(async user => {
                     if (user) {
-                        const { name, email } = user;
+                        const { name, email, avatar } = user;
                         const token = jwt.sign(
                             {
                                 name: name,
                                 email: email,
+                                avatar: avatar,
                             },
                             process.env.JWT_SECRET_KEY,
                             {
@@ -236,7 +238,8 @@ exports.google = async (req, res) => {
                             user: {
                                 _id,
                                 name,
-                                email
+                                email,
+                                avatar
                             },
                         });
                     } else {
@@ -244,18 +247,23 @@ exports.google = async (req, res) => {
                         const user = new User({
                             name: name,
                             email: email,
-                            password: await hash(password, salt, null),
+                            password: await bcrypt.hash(password, salt, null),
+                            avatar: picture,
+                            googleId: sub,
+                            phonenumber: ''
                         });
                         await user
                             .save()
                             .then(user => {
                                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                 // @ts-ignore
-                                const { _id, name, email } = user;
+                                const { _id, name, email, avatar, phonenumber } = user;
                                 const token = jwt.sign(
                                     {
                                         name: name,
                                         email: email,
+                                        avatar: avatar,
+                                        phonenumber: phonenumber
                                     },
                                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                     // @ts-ignore
@@ -272,13 +280,15 @@ exports.google = async (req, res) => {
                                         _id,
                                         name,
                                         email,
+                                        avatar,
+                                        phonenumber
                                     },
                                 });
                             })
                             .catch(err => {
                                 res.status(401).json({
                                     success: false,
-                                    message: err,
+                                    message: err + '',
                                 });
                             });
                     }
@@ -341,7 +351,7 @@ exports.facebook = async (req, res) => {
             user = new User({
                 name: name,
                 email: email,
-                password: await hash(password, salt, null),
+                password: await bcrypt.hash(password, salt, null),
             });
 
             user.save().then(data => {

@@ -34,7 +34,8 @@ let User = new mongoose.Schema({
     },
     googleId: String,
     facebookId: String,
-    status: Boolean
+    status: Boolean,
+    phonenumber: String
 })
 User.plugin(uniqueValidator);
 const UseraModel = mongoose.model('userAccount', User);
