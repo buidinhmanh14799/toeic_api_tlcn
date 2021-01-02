@@ -24,8 +24,11 @@ function requiresLogin(req, res, next) {
 }
 router.get('/', adminController.getall);
 router.get('/:id', adminController.getDetail);
+router.put('/disable/:id', adminController.disableAccount);
+router.put('/enable/:id', adminController.enableAccount);
 router.post('/register', adminController.register);
-router.put('/update/:id', adminController.UpdatePassWord);
+router.put('/updatepassword/:id', adminController.UpdatePassWord);
+router.put('/update/:id', adminController.updateInfo);
 router.post('/login', adminController.login);
 router.post('/google', adminController.google);
 router.post('/facebook', adminController.facebook);

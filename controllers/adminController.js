@@ -104,6 +104,32 @@ exports.updateInfo = (req, res) => {
         });
     })
 }
+exports.disableAccount = (req, res) => {
+    User.findByIdAndUpdate(req.params.id, { $set: { status: false } }).then(user => {
+        return res.status(200).json({
+            success: true,
+            message: user,
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            success: false,
+            message: err + '',
+        });
+    })
+}
+exports.enableAccount = (req, res) => {
+    User.findByIdAndUpdate(req.params.id, { $set: { status: true } }).then(user => {
+        return res.status(200).json({
+            success: true,
+            message: user,
+        });
+    }).catch(err => {
+        return res.status(500).json({
+            success: false,
+            message: err + '',
+        });
+    })
+}
 exports.Singin = (req, res) => {
     User.findOne({ _id: '5fb23ea658bd393618315756' }).then(value => {
         bcrypt.compare('123', value.password).then(rs => {
