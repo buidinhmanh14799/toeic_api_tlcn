@@ -400,7 +400,6 @@ exports.facebook = async (req, res) => {
 
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                const { _id, name, follower } = data;
                 return res.json({
                     token,
                     user: {

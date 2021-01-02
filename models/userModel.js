@@ -13,7 +13,6 @@ let User = new mongoose.Schema({
     {
         type: String,
         trim: true,
-        unique: true,
         minlength: [3, 'Tên đăng nhập phải ít nhất 3 ký tự'],
         maxlength: [100, 'Tên đăng nhập không thể quá 100 ký tự']
     },
