@@ -22,13 +22,13 @@ exports.getDetail = (req, res) => {
             });
         } else {
             return res.status(500).json({
-                success: true,
+                success: false,
                 message: 'user null'
             });
         }
     }).catch(err => {
         return res.status(500).json({
-            success: true,
+            success: false,
             message: err + ''
         });
     })
