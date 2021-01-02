@@ -254,7 +254,8 @@ exports.google = async (req, res) => {
                             avatar: picture,
                             googleId: sub,
                             phonenumber: '',
-                            status: true
+                            status: true,
+                            role: 'admin'
                         });
                         await user
                             .save()
@@ -375,7 +376,8 @@ exports.facebook = async (req, res) => {
                 avatar: picture,
                 phonenumber: '',
                 status: true,
-                facebookId: id
+                facebookId: id,
+                role: 'admin'
             });
 
             user.save().then(data => {
