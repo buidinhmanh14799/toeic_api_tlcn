@@ -278,7 +278,7 @@ exports.google = async (req, res) => {
                                         expiresIn: '24h',
                                     },
                                 );
-                                res.status(200).json({
+                                return res.status(200).json({
                                     success: true,
                                     message: 'Correct Details',
                                     token: token,
@@ -293,7 +293,7 @@ exports.google = async (req, res) => {
                                 });
                             })
                             .catch(err => {
-                                res.status(401).json({
+                                return res.status(401).json({
                                     success: false,
                                     message: err + '',
                                 });
@@ -383,7 +383,21 @@ exports.facebook = async (req, res) => {
             user.save().then(data => {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                const token = jwt.sign({ _id: data._id }, process.env.JWT_SECRET_KEY, { expiresIn: '7d' });
+                const { _id, name, avatar, phonenumber, status } = data;
+                const token = jwt.sign(
+                    {
+                        name: name,
+                        email: email,
+                        avatar: avatar,
+                        phonenumber: phonenumber,
+                        status: status
+                    },
+                    process.env.JWT_SECRET_KEY,
+                    {
+                        expiresIn: '24h',
+                    },
+                );
+
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 const { _id, name, follower } = data;
