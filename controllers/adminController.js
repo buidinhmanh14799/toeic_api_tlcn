@@ -247,6 +247,7 @@ exports.google = async (req, res) => {
                         const { _id, name, avatar, phonenumber, status } = user;
                         const token = jwt.sign(
                             {
+                                id:_id,
                                 name: name,
                                 email: email,
                                 avatar: avatar,
@@ -365,6 +366,7 @@ exports.facebook = async (req, res) => {
             const { _id, name, avatar, phonenumber, status } = user;
             const token = jwt.sign(
                 {
+                    id:_id,
                     name: name,
                     email: email,
                     avatar: avatar,
@@ -410,6 +412,7 @@ exports.facebook = async (req, res) => {
                 const { _id, name, avatar, phonenumber, status } = data;
                 const token = jwt.sign(
                     {
+                        id:_id,
                         name: name,
                         email: email,
                         avatar: avatar,
